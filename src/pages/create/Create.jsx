@@ -1,6 +1,7 @@
 import "./Create.css";
 
 import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Create = () => {
 	const [title, setTitle] = useState("");
@@ -9,6 +10,7 @@ const Create = () => {
 	const [newIngredient, setNewIngredient] = useState("");
 	const [ingredient, setIngredient] = useState([]);
 	const ingredientInput = useRef(null);
+	const navigate = useNavigate();
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
@@ -19,18 +21,20 @@ const Create = () => {
 			cookingTime: `${cookingTime} min`,
 		};
 
-		const addRecipe = () => {
-			fetch("http://localhost:3000/recipes", {
+		const addRecipe = async () => {
+			await fetch("http://localhost:3000/recipes", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(data),
+			}).then(() => {
+				setTitle("");
+				setMethod("");
+				setIngredient("");
+				setCookingTime("");
+				navigate("/");
 			});
-			setTitle("");
-			setMethod("");
-			ingredient("");
-			setCookingTime("");
 		};
 
 		addRecipe();
