@@ -1,15 +1,29 @@
 import "./Create.css";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 
 const Create = () => {
 	const [title, setTitle] = useState("");
 	const [method, setMethod] = useState("");
 	const [cookingTime, setCookingTime] = useState("");
+	const [newIngredient, setNewIngredient] = useState("");
+	const [ingredient, setIngredient] = useState([]);
+	const ingredientInput = useRef(null);
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(title, method, cookingTime);
+		console.log(title, method, cookingTime, ingredient);
+	};
+
+	const addIngredient = (e) => {
+		e.preventDefault();
+		const ing = newIngredient.trim();
+
+		if (ing && !ingredient.includes(ing)) {
+			setIngredient((prevIngredient) => [...prevIngredient, ing]);
+		}
+		setNewIngredient("");
+		ingredientInput.current.focus();
 	};
 
 	return (
@@ -33,8 +47,25 @@ const Create = () => {
 						required
 					/>
 				</label>
-
-				{/* ingredients */}
+				<label>
+					<span>Recipe ingredients</span>
+					<div className="ingredients">
+						<input
+							type="text"
+							onChange={(e) => setNewIngredient(e.target.value)}
+							value={newIngredient}
+							ref={ingredientInput}
+						/>
+						<button className="btn" onClick={addIngredient}>
+							add
+						</button>
+					</div>
+				</label>
+				<p>
+					{ingredient.map((ing) => (
+						<i key={ing}>{ing} </i>
+					))}
+				</p>
 
 				<label>
 					<span>Cooking Time</span>
