@@ -12,7 +12,28 @@ const Create = () => {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
-		console.log(title, method, cookingTime, ingredient);
+		const data = {
+			title,
+			method,
+			ingredient,
+			cookingTime: `${cookingTime} min`,
+		};
+
+		const addRecipe = () => {
+			fetch("http://localhost:3000/recipes", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+			setTitle("");
+			setMethod("");
+			ingredient("");
+			setCookingTime("");
+		};
+
+		addRecipe();
 	};
 
 	const addIngredient = (e) => {
