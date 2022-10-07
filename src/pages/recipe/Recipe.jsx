@@ -1,5 +1,5 @@
 import "./Recipe.css";
-import React, { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const Recipe = () => {
@@ -25,7 +25,7 @@ const Recipe = () => {
 			<div className="error">{error && <p>{error}</p>}</div>
 			<div className="recipe">
 				{recipe && (
-					<>
+					<Fragment>
 						<h2 className="page-title">{recipe.title}</h2>
 						<p>Takes {recipe.cookingTime} to make</p>
 						<ul>
@@ -34,7 +34,7 @@ const Recipe = () => {
 							))}
 						</ul>
 						<p className="method">{recipe.method}</p>
-					</>
+					</Fragment>
 				)}
 			</div>
 		</div>
