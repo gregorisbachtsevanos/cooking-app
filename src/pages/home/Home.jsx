@@ -18,8 +18,6 @@ const Home = () => {
 		getRecipe();
 	}, []);
 
-	console.log(recipes);
-
 	return (
 		<div className="home">
 			{error && <p className="error">{error}</p>}
