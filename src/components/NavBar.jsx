@@ -4,11 +4,18 @@ import Searchbar from "./Searchbar";
 import { useTheme } from "../hooks/useTheme";
 
 export const NavBar = () => {
-	const { color } = useTheme();
+	const { color, changeColor } = useTheme();
 
 	return (
-		<div className="navbar" style={{ backgroundColor: color }}>
-			<nav>
+		<div
+			className="navbar"
+			style={{ backgroundColor: color, transition: ".5s" }}
+		>
+			<nav
+				onClick={() =>
+					changeColor(color === "black" ? "lightgrey" : "black")
+				}
+			>
 				<Link to="/" className="brand">
 					<h1>Home</h1>
 				</Link>
