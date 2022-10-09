@@ -11,10 +11,10 @@ import { useTheme } from './hooks/useTheme'
 import ThemeSelector from './components/ThemeSelector'
 
 function App() {
-	const { bgColor } = useTheme()
+	const { mode } = useTheme()
 
 	return (
-		<div className="App" style={{ backgroundColor: bgColor, transition: ".5s" }}>
+		<div className="App" style={{ backgroundColor: mode, transition: ".5s" }}>
 			<BrowserRouter>
 				<NavBar />
 				<ThemeSelector />
