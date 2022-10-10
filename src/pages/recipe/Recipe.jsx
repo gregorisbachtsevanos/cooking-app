@@ -1,27 +1,40 @@
-import "./Recipe.css";
-import { Fragment, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import './Recipe.css';
+import { Fragment, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { projectFirestore } from '../../firebase/config';
 
 const Recipe = () => {
-	const [recipe, setRecipe] = useState("");
-	const [error, setError] = useState(null);
+	const [recipe, setRecipe] = useState('');
 	const { id } = useParams();
+	const [recipes, setRecipes] = useState([]);
+	const [error, setError] = useState(false);
+	const [isPending, setIsPending] = useState(false);
 
 	useEffect(() => {
-		const getRecipe = async () => {
-			const res = await fetch("http://localhost:3000/recipes/" + id);
-			const data = await res.json();
+		setIsPending(true);
 
-			if (!res.ok) setError("Not Found");
-
-			setRecipe(data);
-		};
-
-		getRecipe();
+		projectFirestore
+			.collection('recipes')
+			.doc(id)
+			.get()
+			.then((doc) => {
+				if (doc.exists) {
+					setIsPending(false);
+					setRecipe(doc.data());
+				} else {
+					setIsPending(false);
+					setError('Could not find that recipe');
+				}
+			})
+			.catch((err) => {
+				setIsPending(false);
+				setError(err.message);
+			});
 	}, [id]);
-	console.log(recipe);
+
 	return (
 		<div>
+			<div className="loading">{isPending && <p>Loading...</p>}</div>
 			<div className="error">{error && <p>{error}</p>}</div>
 			<div className="recipe">
 				{recipe && (
