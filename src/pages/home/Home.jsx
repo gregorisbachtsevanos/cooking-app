@@ -1,25 +1,42 @@
-import "./Home.css";
-import React, { useEffect, useState } from "react";
-import RecipeList from "../../components/RecipeList";
+import './Home.css';
+import React, { useEffect, useState } from 'react';
+import RecipeList from '../../components/RecipeList';
+import { projectFirestore } from '../../firebase/config';
 
 const Home = () => {
 	const [recipes, setRecipes] = useState([]);
-	const [error, setError] = useState(null);
-	useEffect(() => {
-		const getRecipe = async () => {
-			const res = await fetch("http://localhost:3000/recipes");
-			const data = await res.json();
-			if (!res.ok) {
-				return setError("error");
-			}
-			setRecipes(data);
-		};
+	const [error, setError] = useState(false);
+	const [isPending, setIsPending] = useState(false);
 
-		getRecipe();
+	useEffect(() => {
+		setIsPending(true);
+
+		projectFirestore
+			.collection('recipes')
+			.get()
+			.then((snapshot) => {
+				setRecipes(snapshot.docs);
+				if (snapshot.empty) {
+					setError('No recipes to load');
+					setIsPending(false);
+				} else {
+					let result = [];
+					snapshot.docs.forEach((doc) => {
+						result.push({ id: doc.id, ...doc.data() });
+					});
+					setRecipes(result);
+					setIsPending(false);
+				}
+			})
+			.catch((e) => {
+				setError(e.message);
+				setIsPending(false);
+			});
 	}, []);
 
 	return (
 		<div className="home">
+			{isPending && <p className='loading'>loading...</p>}
 			{error && <p className="error">{error}</p>}
 			{recipes && <RecipeList recipes={recipes} />}
 		</div>
