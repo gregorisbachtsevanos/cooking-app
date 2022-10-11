@@ -13,24 +13,33 @@ const Recipe = () => {
 	useEffect(() => {
 		setIsPending(true);
 
+		const unsub = projectFirestore
+			.collection('recipes')
+			.doc(id)
+			.onSnapshot(
+				(doc) => {
+					if (doc.exists) {
+						setIsPending(false);
+						setRecipe(doc.data());
+					} else {
+						setIsPending(false);
+						setError('Could not find that recipe');
+					}
+				},
+				(err) => {
+					setIsPending(false);
+					setError(err.message);
+				}
+			);
+
+		return () => unsub();
+	}, [id]);
+	const updateRecipe = () => {
 		projectFirestore
 			.collection('recipes')
 			.doc(id)
-			.get()
-			.then((doc) => {
-				if (doc.exists) {
-					setIsPending(false);
-					setRecipe(doc.data());
-				} else {
-					setIsPending(false);
-					setError('Could not find that recipe');
-				}
-			})
-			.catch((err) => {
-				setIsPending(false);
-				setError(err.message);
-			});
-	}, [id]);
+			.update({ title: 'New Title' });
+	};
 
 	return (
 		<div>
@@ -47,6 +56,7 @@ const Recipe = () => {
 							))}
 						</ul>
 						<p className="method">{recipe.method}</p>
+						<button onClick={updateRecipe}>Update</button>
 					</Fragment>
 				)}
 			</div>
