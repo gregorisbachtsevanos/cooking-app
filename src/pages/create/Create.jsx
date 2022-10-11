@@ -1,59 +1,51 @@
-import "./Create.css";
+import './Create.css';
 
-import React, { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { projectFirestore } from '../../firebase/config';
 
 const Create = () => {
-	const [title, setTitle] = useState("");
-	const [method, setMethod] = useState("");
-	const [cookingTime, setCookingTime] = useState("");
-	const [newIngredient, setNewIngredient] = useState("");
-	const [ingredient, setIngredient] = useState([]);
+	const [title, setTitle] = useState('');
+	const [method, setMethod] = useState('');
+	const [cookingTime, setCookingTime] = useState('');
+	const [newIngredient, setNewIngredient] = useState('');
+	const [ingredients, setIngredient] = useState([]);
+	const [error, setError] = useState(false);
+	const [isPending, setIsPending] = useState(false);
 	const ingredientInput = useRef(null);
 	const navigate = useNavigate();
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault();
 		const data = {
 			title,
 			method,
-			ingredient,
+			ingredients,
 			cookingTime: `${cookingTime} min`,
 		};
-
-		const addRecipe = async () => {
-			await fetch("http://localhost:3000/recipes", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data),
-			}).then(() => {
-				setTitle("");
-				setMethod("");
-				setIngredient("");
-				setCookingTime("");
-				navigate("/");
-			});
-		};
-
-		addRecipe();
+		try {
+			await projectFirestore.collection('recipes').add(data);
+			navigate('/')
+		} catch (e) {
+			setError(e.message);
+		}
 	};
 
 	const addIngredient = (e) => {
 		e.preventDefault();
 		const ing = newIngredient.trim();
 
-		if (ing && !ingredient.includes(ing)) {
+		if (ing && !ingredients.includes(ing)) {
 			setIngredient((prevIngredient) => [...prevIngredient, ing]);
 		}
-		setNewIngredient("");
+		setNewIngredient('');
 		ingredientInput.current.focus();
 	};
 
 	return (
 		<div className="create">
 			<h2 className="page-title">Add a new Recipe</h2>
+			{error && <p className="error">{error}</p>}
 			<form onSubmit={handleSubmit}>
 				<label>
 					<span>Recipe Title</span>
@@ -87,7 +79,7 @@ const Create = () => {
 					</div>
 				</label>
 				<p>
-					{ingredient.map((ing) => (
+					{ingredients.map((ing) => (
 						<i key={ing}>{ing} </i>
 					))}
 				</p>
